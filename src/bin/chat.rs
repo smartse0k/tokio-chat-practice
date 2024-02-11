@@ -4,7 +4,7 @@ use chat::network::server::Server;
 use tokio::runtime::Runtime;
 
 fn main() {
-  let server = Server::new(
+  let mut server = Server::new(
     &"127.0.0.1".to_string(),
     10000
   );

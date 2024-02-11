@@ -1,6 +1,6 @@
 use std::process::exit;
-
 use tokio::net::TcpListener;
+use crate::network::connection::Connection;
 
 pub struct Server {
   address: String,
@@ -15,7 +15,7 @@ impl Server {
     }
   }
 
-  pub async fn start(&self) {
+  pub async fn start(&mut self) {
     let bind_address = format!("{}:{}", &self.address, self.port);
 
     let Ok(tcp_listener) = TcpListener::bind(&bind_address).await else {
@@ -32,6 +32,13 @@ impl Server {
       };
 
       println!("[INFO] client connected. address={}", socket_addr.to_string());
+
+      let mut connection: Connection = Connection::new(socket_addr, tcp_stream);
+      connection.bind_handler();
+
+      tokio::spawn(async move {
+        connection.process().await;
+      });
     }
   }
 }
